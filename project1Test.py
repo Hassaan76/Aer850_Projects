@@ -33,7 +33,7 @@ y_train = strat_train['Step']
 X_test = strat_test[['X', 'Y', 'Z']]
 y_test = strat_test['Step']
 
-# Combine the training and test sets for visualization
+# Combining the training and test sets for visualization
 X_all = pd.concat([X_train, X_test], ignore_index=True)
 y_all = pd.concat([y_train, y_test], ignore_index=True)
 
@@ -179,9 +179,8 @@ plt.title(f'Confusion Matrix for {best_model_name}')
 plt.show()
 
 
-
 #PART 6 | STACKED MODEL PERFORMANCE ANALYSIS 
-# Step 1: Compute F1 scores for all models, including SVC
+
 f1_scores = {
     'Logistic Regression': f1_lr,
     'Decision Tree': f1_dt,
@@ -189,14 +188,11 @@ f1_scores = {
     'SVC': f1_score(y_test, best_model_svc.predict(X_test), average='weighted')
 }
 
-# Step 2: Sort models based on F1 score in descending order
 sorted_models = sorted(f1_scores.items(), key=lambda x: x[1], reverse=True)
 
-# Step 3: Select the top 2 models
 best_model_1_name, best_f1_model_1 = sorted_models[0]
 best_model_2_name, best_f1_model_2 = sorted_models[1]
 
-# Map model names to actual trained models
 model_dict = {
     'Logistic Regression': best_model_lr,
     'Decision Tree': best_model_dt,
@@ -209,33 +205,30 @@ best_model_2 = model_dict[best_model_2_name]
 
 print(f"Selected models for stacking: {best_model_1_name} and {best_model_2_name}")
 
-# Step 4: Create StackingClassifier with the best two models
 base_models = [
     (best_model_1_name.lower().replace(' ', '_'), best_model_1),
     (best_model_2_name.lower().replace(' ', '_'), best_model_2)
 ]
 
-#Train StackingClassifier
+
 stacked_clf = StackingClassifier(estimators=base_models, final_estimator=LogisticRegression(), cv=5)
 
 stacked_clf.fit(X_train, y_train)
 
-# Step 6: Evaluate Stacked Model
 y_test_pred_stacked = stacked_clf.predict(X_test)
 
 accuracy_stacked = accuracy_score(y_test, y_test_pred_stacked)
 precision_stacked = precision_score(y_test, y_test_pred_stacked, average='weighted')
 f1_stacked = f1_score(y_test, y_test_pred_stacked, average='weighted')
 
-# Step 7: Print performance metrics
 print(f"Stacked Model - Accuracy: {accuracy_stacked}")
 print(f"Stacked Model - Precision: {precision_stacked}")
 print(f"Stacked Model - F1 Score: {f1_stacked}")
 
-# Step 8: Confusion Matrix for the Stacked Model
+
 cm_stacked = confusion_matrix(y_test, y_test_pred_stacked)
 
-# Display confusion matrix
+
 disp_stacked = ConfusionMatrixDisplay(confusion_matrix=cm_stacked, display_labels=stacked_clf.classes_)
 disp_stacked.plot(cmap='rocket')
 plt.xlabel('Predicted Value')
