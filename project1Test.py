@@ -1,33 +1,18 @@
 import pandas as pd
-from sklearn.model_selection import StratifiedShuffleSplit
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error
 import matplotlib.pyplot as plt
-from matplotlib import colormaps
 import seaborn as sns
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.svm import SVR
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import cross_val_score
-import joblib
-from sklearn.metrics import accuracy_score
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import StackingClassifier
-from sklearn.svm import SVC
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.model_selection import StratifiedShuffleSplit
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.model_selection import StratifiedShuffleSplit, GridSearchCV, RandomizedSearchCV, cross_val_score
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.svm import SVR, SVC
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier, StackingClassifier
+from sklearn.metrics import mean_absolute_error, accuracy_score, precision_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
+import joblib
 
-# Load the dataset and remove any missing values
+#PART 1 | DATA PROCESSING
+# Loading the dataset and removing any missing values
 df = pd.read_csv("C:/Users/hassa/Documents/GitHub/Projects/Project_1_Data.csv")
 df = df.dropna()
 df = df.reset_index(drop=True)
@@ -260,16 +245,13 @@ plt.show()
 
 
 #PART 7 | MODEL EVALUATION
-# Save the best SVC model
-import joblib
-import numpy as np
 
-# Function to save the model
+# Function to save model
 def save_model(model, filename):
     joblib.dump(model, filename)
     print(f"Model saved as '{filename}'")
 
-# Function to load the model
+# Function to load model
 def load_model(filename):
     return joblib.load(filename)
 
@@ -278,6 +260,25 @@ def predict_maintenance_steps(model, coordinates):
 
 
 SVC_Project_1 = "best_svc_model.joblib"  
+save_model(best_model_svc, SVC_Project_1)
+
+# Load saved model
+loaded_svc_model = load_model(SVC_Project_1)
+
+# Evaluate loaded model on the test set
+y_test_pred_loaded_svc = loaded_svc_model.predict(X_test)
+
+# Calculate performance metrics
+accuracy_loaded_svc = accuracy_score(y_test, y_test_pred_loaded_svc)
+precision_loaded_svc = precision_score(y_test, y_test_pred_loaded_svc, average='weighted')
+f1_loaded_svc = f1_score(y_test, y_test_pred_loaded_svc, average='weighted')
+
+# Print performance metrics
+print(f"Loaded SVC Model - Accuracy: {accuracy_loaded_svc}")
+print(f"Loaded SVC Model - Precision: {precision_loaded_svc}")
+print(f"Loaded SVC Model - F1 Score: {f1_loaded_svc}")
+
+# Predict maintenance steps using new coordinates
 coordinates = np.array([
     [9.375, 3.0625, 1.51], 
     [6.995, 5.125, 0.3875], 
@@ -286,12 +287,5 @@ coordinates = np.array([
     [9.4, 3, 1.3]
 ])
 
-# Save, load, and predict using functions
-save_model(best_model_svc, SVC_Project_1)
-loaded_svc_model = load_model(SVC_Project_1)
 svc_predictions = predict_maintenance_steps(loaded_svc_model, coordinates)
-
 print("Predicted steps using SVC:", svc_predictions)
-
-
-
